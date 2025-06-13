@@ -3,125 +3,140 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Free Store</title>
+  <title>Mini Online Store</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
-      background: #f5f5f5;
-      color: #333;
+      background: #f4f4f4;
     }
     header {
-      background: #4CAF50;
+      background: #2c3e50;
       color: white;
       padding: 20px;
       text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 10;
     }
-    header h1 {
-      margin: 0;
-    }
-    .cart {
-      font-size: 16px;
-      margin-top: 10px;
-    }
-    nav {
-      background: #388e3c;
-      color: white;
+    .filter {
+      text-align: center;
       padding: 10px;
-      text-align: center;
     }
-    main {
-      padding: 20px;
+    select {
+      padding: 5px;
+      font-size: 16px;
     }
-    .products {
+    .store {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 20px;
+      padding: 20px;
     }
     .product {
       background: white;
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
       border-radius: 8px;
       padding: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
     .product img {
       max-width: 100%;
-      height: 150px;
+      height: 180px;
       object-fit: cover;
       border-radius: 5px;
     }
     .product h3 {
       margin: 10px 0 5px;
     }
-    button {
-      background: #4CAF50;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.3s;
+    .product p {
+      margin: 5px 0;
+      color: #2c3e50;
+      font-weight: bold;
     }
-    button:hover {
-      background: #45a049;
+    .product button {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
     }
     footer {
       text-align: center;
-      padding: 15px;
-      background: #4CAF50;
+      background: #2c3e50;
       color: white;
-      margin-top: 40px;
+      padding: 15px;
+      margin-top: 30px;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>My Free eCommerce Store</h1>
-  <p>Simple • Stylish • Free</p>
-  <div class="cart">🛒 Items in Cart: <span id="cart-count">0</span></div>
+  <h1>Mini Online Store</h1>
+  <p>Browse. Click. Buy.</p>
 </header>
 
-<main>
-  <section class="products">
-    <article class="product">
-      <img src="https://source.unsplash.com/200x150/?shoes" alt="Shoes">
-      <h3>Stylish Shoes</h3>
-      <p>$29.99</p>
-      <button onclick="addToCart('Stylish Shoes')">Add to Cart</button>
-    </article>
-    <article class="product">
-      <img src="https://source.unsplash.com/200x150/?watch" alt="Watch">
-      <h3>Classic Watch</h3>
-      <p>$49.99</p>
-      <button onclick="addToCart('Classic Watch')">Add to Cart</button>
-    </article>
-    <article class="product">
-      <img src="https://source.unsplash.com/200x150/?headphones" alt="Headphones">
-      <h3>Cool Headphones</h3>
-      <p>$39.99</p>
-      <button onclick="addToCart('Cool Headphones')">Add to Cart</button>
-    </article>
-  </section>
+<div class="filter">
+  <label for="category">Filter by category:</label>
+  <select id="category" onchange="filterProducts()">
+    <option value="all">All</option>
+    <option value="fashion">Fashion</option>
+    <option value="tech">Tech</option>
+    <option value="accessories">Accessories</option>
+  </select>
+</div>
+
+<main class="store" id="product-list">
+  <!-- Products will be injected by JavaScript -->
 </main>
 
 <footer>
-  &copy; 2025 My Free Store | Built with ❤️ for Free!
+  &copy; 2025 Mini Store - Powered by You
 </footer>
 
 <script>
-  let cartCount = 0;
-  function addToCart(productName) {
-    cartCount++;
-    document.getElementById("cart-count").textContent = cartCount;
-    alert(productName + " added to cart!");
+  const products = [
+    { name: "Cool Sneakers", price: 49.99, image: "https://source.unsplash.com/300x200/?sneakers", category: "fashion" },
+    { name: "Smart Watch", price: 89.99, image: "https://source.unsplash.com/300x200/?watch", category: "tech" },
+    { name: "Wireless Earbuds", price: 29.99, image: "https://source.unsplash.com/300x200/?earbuds", category: "tech" },
+    { name: "Leather Wallet", price: 19.99, image: "https://source.unsplash.com/300x200/?wallet", category: "accessories" },
+    { name: "Handbag", price: 39.99, image: "https://source.unsplash.com/300x200/?handbag", category: "fashion" }
+  ];
+
+  function displayProducts(list) {
+    const container = document.getElementById("product-list");
+    container.innerHTML = "";
+    list.forEach(product => {
+      container.innerHTML += `
+        <div class="product">
+          <img src="${product.image}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <p>$${product.price.toFixed(2)}</p>
+          <button onclick="buyNow('${product.name}')">Buy Now</button>
+        </div>
+      `;
+    });
   }
+
+  function filterProducts() {
+    const selected = document.getElementById("category").value;
+    if (selected === "all") {
+      displayProducts(products);
+    } else {
+      const filtered = products.filter(p => p.category === selected);
+      displayProducts(filtered);
+    }
+  }
+
+  function buyNow(productName) {
+    // You can customize this with your WhatsApp number
+    const message = encodeURIComponent(`Hi! I'm interested in buying: ${productName}`);
+    window.open(`https://wa.me/1234567890?text=${message}`, "_blank");
+  }
+
+  // Initial load
+  displayProducts(products);
 </script>
 
 </body>
