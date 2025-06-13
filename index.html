@@ -3,62 +3,145 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Image to PDF Converter</title>
+  <title>Free Online Tools</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      padding: 20px;
-      text-align: center;
+    body { font-family: Arial, sans-serif; margin: 0; background: #f9f9f9; }
+    header { background: #333; color: white; padding: 15px; text-align: center; }
+    nav { background: #555; color: white; display: flex; justify-content: center; gap: 15px; padding: 10px; }
+    nav a { color: white; text-decoration: none; font-weight: bold; }
+    section { padding: 20px; max-width: 800px; margin: auto; background: white; margin-top: 20px; border-radius: 10px; }
+    h2 { text-align: center; }
+    button, input[type="number"], input[type="file"] {
+      padding: 8px;
+      margin: 5px;
     }
-    input, button {
-      margin: 10px;
-      padding: 10px;
+    canvas { max-width: 100%; border: 1px solid #ccc; margin-top: 10px; }
+    #calculator button {
+      width: 50px; height: 50px; font-size: 18px; margin: 2px;
     }
-    #preview img {
-      max-width: 150px;
-      margin: 10px;
-      border: 1px solid #ccc;
+    #calculator input {
+      width: 220px; height: 40px; font-size: 20px; margin-bottom: 10px;
     }
+    .tool-container { text-align: center; }
   </style>
 </head>
 <body>
 
-  <h1>🖼️ Image to PDF Converter</h1>
-  <input type="file" id="imageFiles" multiple accept="image/*" />
-  <br>
-  <button onclick="convertToPDF()">Convert to PDF</button>
+<header>
+  <h1>Free Online Tools</h1>
+</header>
 
-  <div id="preview"></div>
+<nav>
+  <a href="#calculator">Calculator</a>
+  <a href="#imgToPDF">Image to PDF</a>
+  <a href="#resizer">Image Resizer</a>
+</nav>
 
-  <script>
-    const preview = document.getElementById("preview");
-    const fileInput = document.getElementById("imageFiles");
+<!-- Calculator -->
+<section id="calculator">
+  <h2>🔢 Calculator</h2>
+  <div class="tool-container">
+    <input type="text" id="calcResult" readonly><br>
+    <div id="calcButtons"></div>
+  </div>
+</section>
 
-    fileInput.addEventListener("change", () => {
-      preview.innerHTML = "";
-      Array.from(fileInput.files).forEach(file => {
-        const img = document.createElement("img");
-        img.src = URL.createObjectURL(file);
-        preview.appendChild(img);
-      });
+<!-- Image to PDF -->
+<section id="imgToPDF">
+  <h2>📄 Image to PDF Converter</h2>
+  <div class="tool-container">
+    <input type="file" id="pdfImages" multiple accept="image/*"><br>
+    <button onclick="convertToPDF()">Convert to PDF</button>
+  </div>
+</section>
+
+<!-- Image Resizer -->
+<section id="resizer">
+  <h2>📐 Image Resizer</h2>
+  <div class="tool-container">
+    <input type="file" id="resizeImgInput" accept="image/*"><br>
+    Width: <input type="number" id="width" value="300"> px
+    Height: <input type="number" id="height" value="300"> px<br>
+    <button onclick="resizeImage()">Resize</button><br>
+    <canvas id="canvas"></canvas><br>
+    <a id="downloadLink" download="resized.png">Download Resized Image</a>
+  </div>
+</section>
+
+<script>
+  // Calculator Logic
+  const calcButtons = [
+    '7','8','9','/','C',
+    '4','5','6','*','←',
+    '1','2','3','-','',
+    '0','.','=','+',''
+  ];
+  const calcDiv = document.getElementById('calcButtons');
+  const calcResult = document.getElementById('calcResult');
+  calcButtons.forEach(b => {
+    const btn = document.createElement("button");
+    btn.innerText = b;
+    btn.onclick = () => {
+      if (b === '=') {
+        try { calcResult.value = eval(calcResult.value); }
+        catch { calcResult.value = "Error"; }
+      } else if (b === 'C') calcResult.value = '';
+      else if (b === '←') calcResult.value = calcResult.value.slice(0, -1);
+      else calcResult.value += b;
+    };
+    calcDiv.appendChild(btn);
+  });
+
+  // Image to PDF Converter
+  async function convertToPDF() {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+    const files = document.getElementById('pdfImages').files;
+
+    if (!files.length) return alert("Please select images.");
+    for (let i = 0; i < files.length; i++) {
+      const data = await toDataURL(files[i]);
+      const img = new Image(); img.src = data; await img.decode();
+      const w = pdf.internal.pageSize.getWidth();
+      const h = pdf.internal.pageSize.getHeight();
+      const r = Math.min(w / img.width, h / img.height);
+      const iw = img.width * r, ih = img.height * r;
+      if (i > 0) pdf.addPage();
+      pdf.addImage(data, 'JPEG', (w - iw) / 2, (h - ih) / 2, iw, ih);
+    }
+    pdf.save("converted.pdf");
+  }
+  function toDataURL(file) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(file);
     });
+  }
 
-    async function convertToPDF() {
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
-      const files = fileInput.files;
+  // Image Resizer
+  function resizeImage() {
+    const file = document.getElementById('resizeImgInput').files[0];
+    const width = +document.getElementById('width').value;
+    const height = +document.getElementById('height').value;
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = e => {
+      img.onload = () => {
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        document.getElementById('downloadLink').href = canvas.toDataURL();
+      };
+      img.src = e.target.result;
+    };
+    if (file) reader.readAsDataURL(file);
+    else alert("Please upload an image.");
+  }
+</script>
 
-      if (files.length === 0) {
-        alert("Please select at least one image.");
-        return;
-      }
-
-      for (let i = 0; i < files.length; i++) {
-        const imgData = await toDataURL(files[i]);
-        const img = new Image();
-        img.src = imgData;
-        await img.decode();
-
-        const pageWidth = pdf.inter
+</body>
+</html>
