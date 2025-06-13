@@ -6,49 +6,77 @@
   <title>My Free Store</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
-      background: #f9f9f9;
+      background: #f5f5f5;
+      color: #333;
     }
     header {
       background: #4CAF50;
       color: white;
       padding: 20px;
       text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 {
+      margin: 0;
+    }
+    .cart {
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    nav {
+      background: #388e3c;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+    main {
+      padding: 20px;
     }
     .products {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
-      padding: 20px;
     }
     .product {
       background: white;
-      border: 1px solid #ddd;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      padding: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       text-align: center;
     }
     .product img {
       max-width: 100%;
       height: 150px;
       object-fit: cover;
+      border-radius: 5px;
+    }
+    .product h3 {
+      margin: 10px 0 5px;
     }
     button {
-      margin-top: 10px;
       background: #4CAF50;
       color: white;
-      padding: 8px 12px;
+      padding: 10px 15px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #45a049;
     }
     footer {
       text-align: center;
-      padding: 10px;
+      padding: 15px;
       background: #4CAF50;
       color: white;
+      margin-top: 40px;
     }
   </style>
 </head>
@@ -57,35 +85,41 @@
 <header>
   <h1>My Free eCommerce Store</h1>
   <p>Simple • Stylish • Free</p>
+  <div class="cart">🛒 Items in Cart: <span id="cart-count">0</span></div>
 </header>
 
-<main class="products">
-  <div class="product">
-    <img src="https://source.unsplash.com/200x150/?shoes" alt="Shoes">
-    <h3>Stylish Shoes</h3>
-    <p>$29.99</p>
-    <button onclick="addToCart('Stylish Shoes')">Add to Cart</button>
-  </div>
-  <div class="product">
-    <img src="https://source.unsplash.com/200x150/?watch" alt="Watch">
-    <h3>Classic Watch</h3>
-    <p>$49.99</p>
-    <button onclick="addToCart('Classic Watch')">Add to Cart</button>
-  </div>
-  <div class="product">
-    <img src="https://source.unsplash.com/200x150/?headphones" alt="Headphones">
-    <h3>Cool Headphones</h3>
-    <p>$39.99</p>
-    <button onclick="addToCart('Cool Headphones')">Add to Cart</button>
-  </div>
+<main>
+  <section class="products">
+    <article class="product">
+      <img src="https://source.unsplash.com/200x150/?shoes" alt="Shoes">
+      <h3>Stylish Shoes</h3>
+      <p>$29.99</p>
+      <button onclick="addToCart('Stylish Shoes')">Add to Cart</button>
+    </article>
+    <article class="product">
+      <img src="https://source.unsplash.com/200x150/?watch" alt="Watch">
+      <h3>Classic Watch</h3>
+      <p>$49.99</p>
+      <button onclick="addToCart('Classic Watch')">Add to Cart</button>
+    </article>
+    <article class="product">
+      <img src="https://source.unsplash.com/200x150/?headphones" alt="Headphones">
+      <h3>Cool Headphones</h3>
+      <p>$39.99</p>
+      <button onclick="addToCart('Cool Headphones')">Add to Cart</button>
+    </article>
+  </section>
 </main>
 
 <footer>
-  <p>&copy; 2025 My Free Store</p>
+  &copy; 2025 My Free Store | Built with ❤️ for Free!
 </footer>
 
 <script>
+  let cartCount = 0;
   function addToCart(productName) {
+    cartCount++;
+    document.getElementById("cart-count").textContent = cartCount;
     alert(productName + " added to cart!");
   }
 </script>
